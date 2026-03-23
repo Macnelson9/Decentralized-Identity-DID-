@@ -477,18 +477,48 @@ const Credentials = () => {
                 <Box>
                   <Typography variant="subtitle2" color="text.secondary" gutterBottom>
                     <Info sx={{ verticalAlign: 'middle', mr: 1 }} />
-                    {activeTab === 'issue' ? 'Issued Credential' : 'Verification Details'}
+                    {activeTab === 'issue' ? 'Issued Credential Details' : 'Verification Details'}
                   </Typography>
-                  <Paper sx={{ p: 2, bgcolor: 'background.default' }}>
-                    <Typography variant="body2" component="pre" sx={{ 
-                      fontFamily: 'monospace', 
-                      fontSize: '0.8rem',
-                      overflowX: 'auto',
-                      maxHeight: '300px',
-                      overflowY: 'auto'
-                    }}>
-                      {JSON.stringify(result, null, 2)}
-                    </Typography>
+                  <Paper sx={{ p: 2, bgcolor: 'background.default', borderRadius: 2 }}>
+                    <Grid container spacing={2}>
+                      {Object.entries(result.credential || result).map(([key, value]) => {
+                        if (key === 'id' || key === 'valid' || key === 'transaction' || key === 'verifiedAt') return null; // Already shown
+                        
+                        const isObject = typeof value === 'object' && value !== null;
+                        const displayKey = key.replace(/([A-Z])/g, ' $1').trim().toUpperCase();
+                        
+                        return (
+                          <Grid item xs={12} key={key}>
+                            <Box sx={{ p: 2, bgcolor: 'background.paper', borderRadius: 1, border: '1px solid', borderColor: 'divider' }}>
+                              <Typography variant="overline" color="text.secondary" sx={{ display: 'block', mb: 1, fontWeight: 'bold' }}>
+                                {displayKey}
+                              </Typography>
+                              
+                              {isObject ? (
+                                <Grid container spacing={2}>
+                                  {Object.entries(value).map(([subKey, subValue]) => (
+                                    <Grid item xs={12} sm={6} md={4} key={subKey}>
+                                      <Box sx={{ p: 1.5, bgcolor: 'background.default', borderRadius: 1, border: '1px solid', borderColor: 'divider' }}>
+                                        <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 0.5, fontWeight: 'bold', textTransform: 'uppercase' }}>
+                                          {subKey.replace(/([A-Z])/g, ' $1').trim()}
+                                        </Typography>
+                                        <Typography variant="body2" sx={{ fontWeight: 500, wordBreak: 'break-word' }}>
+                                          {String(subValue)}
+                                        </Typography>
+                                      </Box>
+                                    </Grid>
+                                  ))}
+                                </Grid>
+                              ) : (
+                                <Typography variant="body1" sx={{ wordBreak: 'break-all' }}>
+                                  {String(value)}
+                                </Typography>
+                              )}
+                            </Box>
+                          </Grid>
+                        );
+                      })}
+                    </Grid>
                   </Paper>
                 </Box>
               </CardContent>
